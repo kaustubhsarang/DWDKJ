@@ -1,26 +1,127 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import axios from 'axios';
+import ReactTable from "react-table";
+import "react-table/react-table.css";
+import { Button, Label } from "./Utils";
+import FadeIn from "react-fade-in";
+import Lottie from "react-lottie";
+import ReactLoading from "react-loading";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+
+      isSelect: false,
+      data: ' ',
+      columns: [],
+      sessionId:-1,
+      done:undefined
+  
+    };
+    this.getData();
+
+  }
+
+  alert1 = () => alert(this.state.query);
+
+  playNext=()=>{
+    this.setState({done:true});
+    var sessionId = this.state.sessionId;
+    console.log(sessionId);
+    axios.get('https://webapp-191120202122.azurewebsites.net/api/v1/sessionId/'+sessionId+'/play')
+    .then(response=>{
+      this.getData();
+    })
+    .then(a=>this.setState({done:false}))
+  }
+
+  getData = () => {
+
+
+    console.log(this.state.data)
+    axios.get('https://webapp-191120202122.azurewebsites.net/Karaoke/gig/1/getUserQueue')
+      .then(response => {
+          console.log(response.data);
+
+          var returnData = [] ;
+          let setColumns = [];
+          const isSelect = true;
+        
+            
+            if (response.data.length>0) {
+              Object.keys(response.data[0]).forEach(key => {
+                setColumns.push({
+                  Header: key,
+                  accessor: key
+                })
+              })
+
+              returnData = response.data;
+                        this.setState(state => {
+           return ({ data:returnData, columns: setColumns, isSelect,sessionId:returnData[0].sessionId})
+          })
+          }
+
+
+      })
+      .catch(error => {
+          console.log(error);
+          this.setState(state => {
+            return ({ data: error.message})
+          }) 
+      });
+  }
+
+
+
+  
+  render() {
+    const { data, columns, isSelect  } = this.state;
+ // const { currentSong } = this.state;
+    return (
+      <div style={{margin: 'auto', textAlign: 'center'}}>
+
+        <h1> Karaoke DJ Portal</h1>
+         
+          {/* new */}
+        {this.state.done?(<div style={{margin:'200px'}}><ReactLoading type={"bars"} color={"red"} /></div>):(
+        <div>
+        <div>
+          {this.state.data!==" "?
+            <div>        
+        <label value='Label1' style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>Currently Playing: </label>
+        <label value='Label2'style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>"{this.state.data[0].songName}" by "</label>
+        <label value='Label3'style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>{this.state.data[0].userName}" </label>
+         </div> 
+           :<div> <label value='Label4' style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>Currently Playing: </label>
+          </div> }       
+        </div>
+
+
+  
+        <div style={{display: 'flex',margin: '5px',border: '2px solid #ececec', justifyContent: 'space-between'}}>
+          <Button value={'Play'}  style={{backgroundColor: '#3dce3d'}}/>
+          <Button value={'Pause'}  style={{backgroundColor: '#FFA500'}}/>
+          <Button value={'Next'} onClick={this.playNext} style={{backgroundColor: '#1E90FF'}}/>
+        </div>
+        <br />
+        <br />
+       
+        {this.state.data !== " "  && isSelect ?
+        <ReactTable
+          data={data}
+          columns={columns}
+          defaultPageSize={10}
+          className="-striped -highlight"
+        />
+        : <p>{data}</p> }
+        </div> )}
+      </div>
+    );
+  }
 }
+
 
 export default App;
