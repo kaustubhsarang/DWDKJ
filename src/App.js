@@ -17,22 +17,46 @@ class App extends Component {
       data: ' ',
       columns: [],
       sessionId:-1,
-      done:undefined
+      done:undefined,
+      currUser: ' ',
+      currSong:' '
   
     };
     this.getData();
+    this.getCurrent();
 
   }
 
-  alert1 = () => alert(this.state.query);
+stopSong=()=>{
+  this.setState({done:true});
+  var sessionId = this.state.sessionId;
+  axios.get('https://webapp-191120202122.azurewebsites.net/api/v1/sessionId/'+sessionId+'/stop')
+  .then(response=>{
+    this.getData();
+  })
+  .then(a=>this.setState({done:false}))
+}
+
+getCurrent=()=>{
+  axios.get('http://localhost:8080/Karaoke/gig/1/getCurrentUserQueue')
+  .then(response=>{
+    this.setState({currSong:response.data.songName,currUser:response.data.userName, sessionId:response.data.sessionId });
+    // var user = response.data.userName;
+    // var list = [];
+    // list.push(user);
+    // list.push(song);
+  })
+}
 
   playNext=()=>{
     this.setState({done:true});
     var sessionId = this.state.sessionId;
     console.log(sessionId);
-    axios.get('https://webapp-191120202122.azurewebsites.net/api/v1/sessionId/'+sessionId+'/play')
+    // axios.get('https://webapp-191120202122.azurewebsites.net/api/v1/sessionId/'+sessionId+'/play')
+    axios.get('http://localhost:8080/api/v1/sessionId/'+sessionId+'/play')
     .then(response=>{
       this.getData();
+      this.getCurrent();
     })
     .then(a=>this.setState({done:false}))
   }
@@ -41,7 +65,7 @@ class App extends Component {
 
 
     console.log(this.state.data)
-    axios.get('https://webapp-191120202122.azurewebsites.net/Karaoke/gig/1/getUserQueue')
+    axios.get('http://localhost:8080/Karaoke/gig/1/getUserQueue')
       .then(response => {
           console.log(response.data);
 
@@ -60,7 +84,7 @@ class App extends Component {
 
               returnData = response.data;
                         this.setState(state => {
-           return ({ data:returnData, columns: setColumns, isSelect,sessionId:returnData[0].sessionId})
+           return ({ data:returnData, columns: setColumns, isSelect})
           })
           }
 
@@ -92,8 +116,8 @@ class App extends Component {
           {this.state.data!==" "?
             <div>        
         <label value='Label1' style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>Currently Playing: </label>
-        <label value='Label2'style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>"{this.state.data[0].songName}" by "</label>
-        <label value='Label3'style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>{this.state.data[0].userName}" </label>
+        <label value='Label2'style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>"{this.state.currSong}" by "</label>
+        <label value='Label3'style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>{this.state.currUser}" </label>
          </div> 
            :<div> <label value='Label4' style={{color:'black', fontFamily:'cursive', fontSize:'30px'}}>Currently Playing: </label>
           </div> }       
