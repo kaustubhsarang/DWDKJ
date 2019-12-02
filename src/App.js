@@ -38,7 +38,7 @@ stopSong=()=>{
 }
 
 getCurrent=()=>{
-  axios.get('http://localhost:8080/Karaoke/gig/1/getCurrentUserQueue')
+  axios.get('https://webapp-191120202122.azurewebsites.net/Karaoke/gig/1/getCurrentUserQueue')
   .then(response=>{
     this.setState({currSong:response.data.songName,currUser:response.data.userName, sessionId:response.data.sessionId });
     // var user = response.data.userName;
@@ -52,8 +52,8 @@ getCurrent=()=>{
     this.setState({done:true});
     var sessionId = this.state.sessionId;
     console.log(sessionId);
-    // axios.get('https://webapp-191120202122.azurewebsites.net/api/v1/sessionId/'+sessionId+'/play')
-    axios.get('http://localhost:8080/api/v1/sessionId/'+sessionId+'/play')
+    axios.get('https://webapp-191120202122.azurewebsites.net/api/v1/sessionId/'+sessionId+'/play')
+    // axios.get('http://localhost:8080/api/v1/sessionId/'+sessionId+'/play')
     .then(response=>{
       this.getData();
       this.getCurrent();
@@ -65,7 +65,7 @@ getCurrent=()=>{
 
 
     console.log(this.state.data)
-    axios.get('http://localhost:8080/Karaoke/gig/1/getUserQueue')
+    axios.get('https://webapp-191120202122.azurewebsites.net/Karaoke/gig/1/getUserQueue')
       .then(response => {
           console.log(response.data);
 
