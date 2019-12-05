@@ -26,7 +26,7 @@ class App extends Component {
     this.getCurrent();
 
   }
-
+//test
 stopSong=()=>{
   this.setState({done:true});
   var sessionId = this.state.sessionId;
@@ -75,14 +75,28 @@ getCurrent=()=>{
         
             
             if (response.data.length>0) {
-              Object.keys(response.data[0]).forEach(key => {
-                setColumns.push({
-                  Header: key,
-                  accessor: key
-                })
-              })
-
-              returnData = response.data;
+              // Object.keys(response.data[0]).forEach(key => {
+              //   setColumns.push({
+              //     Header: key,
+              //     accessor: key
+              //   })
+              // })
+               setColumns = [{  
+                Header: 'Sr no',  
+                accessor: 'sNo'  
+                },{  
+                Header: 'Title',  
+                accessor: 'songName'},{
+                Header: 'Singer',  
+                accessor: 'userName'
+                }]  
+              var i=0;
+              for(i in response.data)
+              {
+               
+              returnData.push({sNo: (i - 0) + 1,songName:response.data[i].songName, userName:response.data[i].userName})
+             i++;
+            }// returnData = response.data;
                         this.setState(state => {
            return ({ data:returnData, columns: setColumns, isSelect})
           })
@@ -96,7 +110,10 @@ getCurrent=()=>{
             return ({ data: error.message})
           }) 
       });
+     // this.intervalID = setTimeout(this.getData.bind(this), 10000);
   }
+
+
 
 
 
